@@ -11,6 +11,23 @@ int main() {
     printf("A carta com o maior valor vence a rodada.\n\n");
     printf("Vamos começar!\n\n");
     
+    // Escolha de modo de entrada de dados
+    printf("Escolha o modo de entrada de dados:\n");
+    printf("2. Entrada de dados pela CPU (modo demonstrativo)\n");
+    printf("1. Entrada de dados pelos usuários\n");
+    int int_modo_entrada = 1; // O padrão de entrada é 1, o jogo pede que os usuários criem as cartas.
+    
+    do {
+        printf("Digite 0 ou 1: ");
+    } while (scanf("%d", &int_modo_entrada) != 1 || (int_modo_entrada != 0 && int_modo_entrada != 1));
+
+        if (int_modo_entrada == 0) {
+            printf("Modo demonstrativo selecionado.\n");
+        } else {
+            printf("Modo usuário selecionado.\n");
+    }
+    
+
     // Variáveis para armazenar os dados dos jogadores
     char str_cidade_jogador_A [33]= "Manaus";
     char str_cidade_jogador_B [33] = "Sao Paulo";
@@ -22,8 +39,18 @@ int main() {
     float float_pib_jogador_B = 999.00;
     int qtde_pontos_turisticos_jogador_A = 9;
     int qtde_pontos_turisticos_jogador_B = 9;
+
+
+    // Entrada de dados pela CPU (modo demonstrativo)
+    // Usando dados pré-definidos para simular a entrada de dados
+    printf("====================================================\n");
+    printf("          CRIAÇÃO DAS CARTAS - Pela CPU\n"          );
+    printf("====================================================\n");
     
-    // Entrada de dados dos jogadores
+    // Entrada de dados dos jogadores pelos usuários
+    printf("========================================\n");
+    printf("          CRIAÇÃO DAS CARTAS           \n");
+    printf("========================================\n\n");
     printf("Primeiro vamos aos dados do jogador A.\n");
     printf("Jogador A, pode me dizer qual a cidade da sua carta: \n");
     scanf("%s", str_cidade_jogador_A);
