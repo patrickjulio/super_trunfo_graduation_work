@@ -3,18 +3,20 @@
 #include <string.h>
 #include <time.h>
 
-//Identificadores de atributos
-#define IDX_CIDADE 0
-#define IDX_POPULACAO 1
-#define IDX_AREA 2
-#define IDX_PIB 3
-#define IDX_PONTOS_TURISTICOS 4
-#define IDX_DENSIDADE 5
-#define IDX_PIB_PER_CAPITA 6
-#define IDX_SUPER_PODER 7
+//Identificadores de atributos - correspondem aos números mostrados no menu
+#define IDX_POPULACAO 1      // opção 1 no menu
+#define IDX_AREA 2           // opção 2 no menu
+#define IDX_DENSIDADE 3      // opção 3 no menu
+#define IDX_PIB 4            // opção 4 no menu
+#define IDX_PIB_PER_CAPITA 5 // opção 5 no menu
+#define IDX_PONTOS_TURISTICOS 6 // opção 6 no menu
+#define IDX_SUPER_PODER 7    // opção 7 no menu
 
 // Função utilitária para limpar o buffer de entrada
-void limpar_buffer() {
+// ou coletar a tecla Enter, recurso comum para ir
+// para a próxima tela em jogos
+
+void limpar_buffer_ate_enter() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
@@ -33,14 +35,15 @@ typedef struct {
 
 // Função para acessar atributos númericos das cartas
 float acessarAtributo(Carta* carta, int indice) {
+    // Os casos correspondem às opções do menu (1-7)
     switch (indice) {
-        case IDX_POPULACAO: return carta->populacao;
-        case IDX_AREA: return carta->area;
-        case IDX_PIB: return carta->pib;
-        case IDX_PONTOS_TURISTICOS: return (float)carta->pontos_turisticos;
-        case IDX_DENSIDADE: return carta->densidade_populacional;
-        case IDX_PIB_PER_CAPITA: return carta->pib_per_capita;
-        case IDX_SUPER_PODER: return carta->super_poder;
+        case IDX_POPULACAO: return carta->populacao;          // opção 1
+        case IDX_AREA: return carta->area;                    // opção 2
+        case IDX_DENSIDADE: return carta->densidade_populacional; // opção 3
+        case IDX_PIB: return carta->pib;                      // opção 4
+        case IDX_PIB_PER_CAPITA: return carta->pib_per_capita;   // opção 5
+        case IDX_PONTOS_TURISTICOS: return (float)carta->pontos_turisticos; // opção 6
+        case IDX_SUPER_PODER: return carta->super_poder;      // opção 7
         default: return -1.0f; // índice inválido ou não numérico
     }
 }
@@ -81,12 +84,13 @@ int main(void) {
 
         .seleção_de_modo_de_jogo =
             "\n========================================\n"
-            "Vamos começar!\n\n"
-            "Escolha o modo de entrada de dados:\n"
+            "        SELEÇÃO DE MODO DE JOGO\n"
+            "========================================\n"
+            "Vamos começar!\n"
             "1 - Entrada de dados pela CPU (modo demonstrativo)\n"
-            "2 - Entrada de dados pelos usuários com atributo aleátorio\n"
+            "2 - Entrada de dados pelos usuários com atributo aleatório\n"
             "3 - Voltar ao menu inicial\n"
-            "========================================\n",
+            "Escolha o modo de entrada de dados com o dígito correspondente (1-3):\n",
 
         .regras =
             "\n========================================\n"
@@ -320,8 +324,7 @@ int main(void) {
                 // 5 = Créditos
                 case 0: { // Intro
                     printf("%s", telas.intro);
-                    getchar();
-                    limpar_buffer();
+                    limpar_buffer_ate_enter();
                     tela_atual = 1;
                     break;
                 }
@@ -330,7 +333,7 @@ int main(void) {
                     int opcao;
                     while (1) {
                         if (scanf("%d", &opcao) != 1) { // Verifica se a entrada é um número
-                            limpar_buffer();
+                            limpar_buffer_ate_enter();
                             printf("Opção inválida. Por favor, escolha 1, 2 ou 3:\n");
                             continue;
                         }
@@ -342,7 +345,7 @@ int main(void) {
                             case 2:{ // Regras
                                 tela_atual = 3;
                                 getchar();
-                                limpar_buffer();
+                                limpar_buffer_ate_enter();
                                 break;
                         }
                             case 3:{ // Sair
@@ -364,26 +367,34 @@ int main(void) {
                     int carta_escolhida_jogador_1 = -1;
                     int carta_escolhida_jogador_2 = -1;
                     int atributo_escolhido = -1;
-                    while (escolha_jogo < 1 || escolha_jogo > 3) {
-                        if (scanf("%d", &escolha_jogo) != 1) { // Verifica se a entrada é um número
-                            limpar_buffer();
-                            printf("Opção inválida. Por favor, escolha 0, 1, 2 ou 3: \n");
-                            continue;
+                    while (1) {
+                        if (scanf("%d", &escolha_jogo) != 1) {
+                            limpar_buffer_ate_enter();
+                            printf("Entrada inválida. Por favor, digite 1, 2 ou 3:\n");
+                        continue;
+                    }
+                        if (escolha_jogo >= 1 && escolha_jogo <= 3) {
+                            break; // Entrada válida
+                        } else {
+                            printf("Entrada inválida. Por favor, digite 1, 2 ou 3:\n");
                         }
                     }
                     switch (escolha_jogo){
                         case 1:{ // CPU modo demonstrativo (escolhe duas cartas prontas de 08 cartas)
-                            printf("Modo demonstrativo selecionado.\n");
+                            printf("\nModo demonstrativo selecionado.\n");
                             printf("\n========================================\n");
                             printf("          MODO DEMONSTRATIVO           \n");
                             printf("========================================\n\n");
                             srand((unsigned int)time(NULL));
                             // escolher índices entre 0 e 7 (o baralho tem 8 cartas)
                             carta_escolhida_jogador_1 = rand() % 8;
-                            printf("\nA CPU escolheu a carta número %d para o jogador 1!\n", carta_escolhida_jogador_1);
                             carta_escolhida_jogador_2 = rand() % 8;
-                            printf("A CPU escolheu a carta número %d para o jogador 2!\n", carta_escolhida_jogador_2);
-                            atributo_escolhido = (rand() % 7) + 1;
+                            /* Garante que as duas cartas escolhidas pela CPU sejam distintas. */
+                            while (carta_escolhida_jogador_2 == carta_escolhida_jogador_1) {
+                                carta_escolhida_jogador_2 = rand() % 8;
+                                printf("CPU sorteou novamente para garantir cartas diferentes.\n");
+                            }
+                            atributo_escolhido = (rand() % 7) + 1; // soma com  1 para excluir o 0 dos intervalos possíveis
                             
                             // Mapear os índices para os ponteiros das cartas
                             Carta *selA = NULL, *selB = NULL;
@@ -409,6 +420,10 @@ int main(void) {
                                 case 7: selB = &carta_Curitiba; break;
                                 default: selB = &carta_SaoPaulo; break;
                             }
+
+                            // Mostrar nomes das cartas escolhidas (em vez do número)
+                            printf("A CPU escolheu a carta '%s' para o jogador 1!\n", acessarNomeCidade(selA));
+                            printf("A CPU escolheu a carta '%s' para o jogador 2!\n", acessarNomeCidade(selB));
 
                             // Pré-calcular variáveis usadas nas mensagens de saída
                             int int_populacao_jogador_A = (int)selA->populacao;
@@ -543,15 +558,16 @@ int main(void) {
                             printf("7 - Curitiba\n");
                             printf("8 - Criar nova carta\n");
 
-                                    while (carta_escolhida_jogador_1 < 0 || carta_escolhida_jogador_1 > 8) {
-                                        if (scanf("%d", &carta_escolhida_jogador_1) != 1) {
-                                            limpar_buffer();
-                                            printf("Opção inválida. Por favor, escolha um carta de 0 a 7:\n");
-                                            continue;
-                                        }
+                                while (carta_escolhida_jogador_1 < 0 || carta_escolhida_jogador_1 > 8) {
+                                    if (scanf("%d", &carta_escolhida_jogador_1) != 1) {
+                                        limpar_buffer_ate_enter();
+                                        printf("Opção inválida. Por favor, escolha um carta de 0 a 7:\n");
+                                        continue;
                                     }
+                                }
 
-                            printf("Jogador 2, escolha sua carta (0-8):\n");
+                            printf("\nCarta escolhida pelo Jogador 1: %d\n", carta_escolhida_jogador_1);
+                            printf("\nJogador 2, escolha sua carta (0-8) (não pode escolher a mesma carta do Jogador 1):\n");
                             printf("0 - Manaus\n");
                             printf("1 - Sao Paulo\n");
                             printf("2 - Rio de Janeiro\n");
@@ -562,12 +578,22 @@ int main(void) {
                             printf("7 - Curitiba\n");
                             printf("8 - Criar nova carta\n");
 
-                            while (carta_escolhida_jogador_2 < 0 || carta_escolhida_jogador_2 > 8) {
+                            while (1) {
                                 if (scanf("%d", &carta_escolhida_jogador_2) != 1) {
-                                    limpar_buffer();
-                                    printf("Opção inválida. Por favor, escolha um carta de 0 a 8:\n");
+                                    limpar_buffer_ate_enter();
+                                    printf("Opção inválida. Por favor, escolha uma carta válida de 0 a 8:\n");
                                     continue;
                                 }
+                                /* validações: intervalo e não repetição da carta escolhida pelo jogador 1 */
+                                if (carta_escolhida_jogador_2 < 0 || carta_escolhida_jogador_2 > 8) {
+                                    printf("Opção fora do intervalo. Escolha uma carta de 0 a 8:\n");
+                                    continue;
+                                }
+                                if (carta_escolhida_jogador_2 == carta_escolhida_jogador_1) {
+                                    printf("Essa carta já foi escolhida pelo Jogador 1. Escolha outra carta:\n");
+                                    continue;
+                                }
+                                break; /* escolha válida */
                             }
                             break;
                         }
@@ -587,11 +613,11 @@ int main(void) {
                     int opcao = 0;
                     while (1) {
                         if (scanf("%d", &opcao) != 1) {
-                            limpar_buffer();
+                            limpar_buffer_ate_enter();
                             printf("\nPor favor digite 1 para voltar ao menu inicial:\n");
                             continue;
                         }
-                        limpar_buffer();
+                        limpar_buffer_ate_enter();
                         if (opcao == 1) break;
                         printf("\nPor favor digite 1 para voltar ao menu inicial: ");
                     }
@@ -607,7 +633,7 @@ int main(void) {
                     printf("%s", telas.créditos);
                     tela_atual = 0;
                     getchar();
-                    limpar_buffer();
+                    limpar_buffer_ate_enter();
                     break;
                 }
                 default: { // Erro: tela desconhecida
