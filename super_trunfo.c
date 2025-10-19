@@ -129,14 +129,10 @@ int main(void) {
     carta_Manaus.area = 11401.0;
     carta_Manaus.pib = 74.0;
     carta_Manaus.pontos_turisticos = 8;
-    if (carta_Manaus.area != 0.0f)
-        carta_Manaus.densidade_populacional = carta_Manaus.populacao * 1000000 / carta_Manaus.area;
-    else
-        carta_Manaus.densidade_populacional = 0.0f;
-    if (carta_Manaus.populacao != 0.0f)
-        carta_Manaus.pib_per_capita = (carta_Manaus.pib * 1000000000) / (carta_Manaus.populacao * 1000000);
-    else
-        carta_Manaus.pib_per_capita = 0.0f;
+    carta_Manaus.densidade_populacional = (carta_Manaus.area != 0.0f) ? 
+        (carta_Manaus.populacao * 1000000 / carta_Manaus.area) : 0.0f;
+    carta_Manaus.pib_per_capita = (carta_Manaus.populacao != 0.0f) ?
+        ((carta_Manaus.pib * 1000000000) / (carta_Manaus.populacao * 1000000)) : 0.0f;
     carta_Manaus.super_poder = carta_Manaus.populacao * 1000000 + carta_Manaus.area + carta_Manaus.pib +
                                carta_Manaus.pontos_turisticos + carta_Manaus.pib_per_capita +
                                (carta_Manaus.densidade_populacional != 0.0f ? 1.0f / carta_Manaus.densidade_populacional : 0.0f);
@@ -148,14 +144,10 @@ int main(void) {
     carta_SaoPaulo.area = 1521.0;
     carta_SaoPaulo.pib = 443.0;
     carta_SaoPaulo.pontos_turisticos = 15;
-    if (carta_SaoPaulo.area != 0.0f)
-        carta_SaoPaulo.densidade_populacional = carta_SaoPaulo.populacao * 1000000 / carta_SaoPaulo.area;
-    else
-        carta_SaoPaulo.densidade_populacional = 0.0f;
-    if (carta_SaoPaulo.populacao != 0.0f)
-        carta_SaoPaulo.pib_per_capita = (carta_SaoPaulo.pib * 1000000000) / (carta_SaoPaulo.populacao * 1000000);
-    else
-        carta_SaoPaulo.pib_per_capita = 0.0f;
+    carta_SaoPaulo.densidade_populacional = (carta_SaoPaulo.area != 0.0f) ? 
+        (carta_SaoPaulo.populacao * 1000000 / carta_SaoPaulo.area) : 0.0f;
+    carta_SaoPaulo.pib_per_capita = (carta_SaoPaulo.populacao != 0.0f) ?
+        ((carta_SaoPaulo.pib * 1000000000) / (carta_SaoPaulo.populacao * 1000000)) : 0.0f;
     carta_SaoPaulo.super_poder = carta_SaoPaulo.populacao * 1000000 + carta_SaoPaulo.area + carta_SaoPaulo.pib +
                                  carta_SaoPaulo.pontos_turisticos + carta_SaoPaulo.pib_per_capita +
                                  (carta_SaoPaulo.densidade_populacional != 0.0f ? 1.0f / carta_SaoPaulo.densidade_populacional : 0.0f);
@@ -167,14 +159,10 @@ int main(void) {
     carta_RioDeJaneiro.area = 1182.0;
     carta_RioDeJaneiro.pib = 200.0;
     carta_RioDeJaneiro.pontos_turisticos = 10;
-    if (carta_RioDeJaneiro.area != 0.0f)
-        carta_RioDeJaneiro.densidade_populacional = carta_RioDeJaneiro.populacao * 1000000 / carta_RioDeJaneiro.area;
-    else
-        carta_RioDeJaneiro.densidade_populacional = 0.0f;
-    if (carta_RioDeJaneiro.populacao != 0.0f)
-        carta_RioDeJaneiro.pib_per_capita = (carta_RioDeJaneiro.pib * 1000000000) / (carta_RioDeJaneiro.populacao * 1000000);
-    else
-        carta_RioDeJaneiro.pib_per_capita = 0.0f;
+    carta_RioDeJaneiro.densidade_populacional = (carta_RioDeJaneiro.area != 0.0f) ? 
+        (carta_RioDeJaneiro.populacao * 1000000 / carta_RioDeJaneiro.area) : 0.0f;
+    carta_RioDeJaneiro.pib_per_capita = (carta_RioDeJaneiro.populacao != 0.0f) ?
+        ((carta_RioDeJaneiro.pib * 1000000000) / (carta_RioDeJaneiro.populacao * 1000000)) : 0.0f;
     carta_RioDeJaneiro.super_poder = carta_RioDeJaneiro.populacao * 1000000 + carta_RioDeJaneiro.area + carta_RioDeJaneiro.pib +
                                      carta_RioDeJaneiro.pontos_turisticos + carta_RioDeJaneiro.pib_per_capita +
                                      (carta_RioDeJaneiro.densidade_populacional != 0.0f ? 1.0f / carta_RioDeJaneiro.densidade_populacional : 0.0f);
@@ -186,14 +174,10 @@ int main(void) {
     carta_Brasilia.area = 5802.0;
     carta_Brasilia.pib = 220.0;
     carta_Brasilia.pontos_turisticos = 5;
-    if (carta_Brasilia.area != 0.0f)
-        carta_Brasilia.densidade_populacional = carta_Brasilia.populacao * 1000000 / carta_Brasilia.area;
-    else
-        carta_Brasilia.densidade_populacional = 0.0f;
-    if (carta_Brasilia.populacao != 0.0f)
-        carta_Brasilia.pib_per_capita = (carta_Brasilia.pib * 1000000000) / (carta_Brasilia.populacao * 1000000);
-    else
-        carta_Brasilia.pib_per_capita = 0.0f;
+    carta_Brasilia.densidade_populacional = (carta_Brasilia.area != 0.0f) ? 
+        (carta_Brasilia.populacao * 1000000 / carta_Brasilia.area) : 0.0f;
+    carta_Brasilia.pib_per_capita = (carta_Brasilia.populacao != 0.0f) ?
+        ((carta_Brasilia.pib * 1000000000) / (carta_Brasilia.populacao * 1000000)) : 0.0f;
     carta_Brasilia.super_poder = carta_Brasilia.populacao * 1000000 + carta_Brasilia.area + carta_Brasilia.pib +
                                  carta_Brasilia.pontos_turisticos + carta_Brasilia.pib_per_capita +
                                  (carta_Brasilia.densidade_populacional != 0.0f ? 1.0f / carta_Brasilia.densidade_populacional : 0.0f);
@@ -205,14 +189,10 @@ int main(void) {
     carta_Salvador.area = 693.0;
     carta_Salvador.pib = 130.0;
     carta_Salvador.pontos_turisticos = 7;
-    if (carta_Salvador.area != 0.0f)
-        carta_Salvador.densidade_populacional = carta_Salvador.populacao * 1000000 / carta_Salvador.area;
-    else
-        carta_Salvador.densidade_populacional = 0.0f;
-    if (carta_Salvador.populacao != 0.0f)
-        carta_Salvador.pib_per_capita = (carta_Salvador.pib * 1000000000) / (carta_Salvador.populacao * 1000000);
-    else
-        carta_Salvador.pib_per_capita = 0.0f;
+    carta_Salvador.densidade_populacional = (carta_Salvador.area != 0.0f) ? 
+        (carta_Salvador.populacao * 1000000 / carta_Salvador.area) : 0.0f;
+    carta_Salvador.pib_per_capita = (carta_Salvador.populacao != 0.0f) ?
+        ((carta_Salvador.pib * 1000000000) / (carta_Salvador.populacao * 1000000)) : 0.0f;
     carta_Salvador.super_poder = carta_Salvador.populacao * 1000000 + carta_Salvador.area + carta_Salvador.pib +
                                  carta_Salvador.pontos_turisticos + carta_Salvador.pib_per_capita +
                                  (carta_Salvador.densidade_populacional != 0.0f ? 1.0f / carta_Salvador.densidade_populacional : 0.0f);
@@ -224,14 +204,10 @@ int main(void) {
     carta_Fortaleza.area = 313.0;
     carta_Fortaleza.pib = 90.0;
     carta_Fortaleza.pontos_turisticos = 6;
-    if (carta_Fortaleza.area != 0.0f)
-        carta_Fortaleza.densidade_populacional = carta_Fortaleza.populacao * 1000000 / carta_Fortaleza.area;
-    else
-        carta_Fortaleza.densidade_populacional = 0.0f;
-    if (carta_Fortaleza.populacao != 0.0f)
-        carta_Fortaleza.pib_per_capita = (carta_Fortaleza.pib * 1000000000) / (carta_Fortaleza.populacao * 1000000);
-    else
-        carta_Fortaleza.pib_per_capita = 0.0f;
+    carta_Fortaleza.densidade_populacional = (carta_Fortaleza.area != 0.0f) ? 
+        (carta_Fortaleza.populacao * 1000000 / carta_Fortaleza.area) : 0.0f;
+    carta_Fortaleza.pib_per_capita = (carta_Fortaleza.populacao != 0.0f) ?
+        ((carta_Fortaleza.pib * 1000000000) / (carta_Fortaleza.populacao * 1000000)) : 0.0f;
     carta_Fortaleza.super_poder = carta_Fortaleza.populacao * 1000000 + carta_Fortaleza.area + carta_Fortaleza.pib +
                                   carta_Fortaleza.pontos_turisticos + carta_Fortaleza.pib_per_capita +
                                   (carta_Fortaleza.densidade_populacional != 0.0f ? 1.0f / carta_Fortaleza.densidade_populacional : 0.0f);
@@ -243,14 +219,10 @@ int main(void) {
     carta_BeloHorizonte.area = 331.0;
     carta_BeloHorizonte.pib = 110.0;
     carta_BeloHorizonte.pontos_turisticos = 4;
-    if (carta_BeloHorizonte.area != 0.0f)
-        carta_BeloHorizonte.densidade_populacional = carta_BeloHorizonte.populacao * 1000000 / carta_BeloHorizonte.area;
-    else
-        carta_BeloHorizonte.densidade_populacional = 0.0f;
-    if (carta_BeloHorizonte.populacao != 0.0f)
-        carta_BeloHorizonte.pib_per_capita = (carta_BeloHorizonte.pib * 1000000000) / (carta_BeloHorizonte.populacao * 1000000);
-    else
-        carta_BeloHorizonte.pib_per_capita = 0.0f;
+    carta_BeloHorizonte.densidade_populacional = (carta_BeloHorizonte.area != 0.0f) ? 
+        (carta_BeloHorizonte.populacao * 1000000 / carta_BeloHorizonte.area) : 0.0f;
+    carta_BeloHorizonte.pib_per_capita = (carta_BeloHorizonte.populacao != 0.0f) ?
+        ((carta_BeloHorizonte.pib * 1000000000) / (carta_BeloHorizonte.populacao * 1000000)) : 0.0f;
     carta_BeloHorizonte.super_poder = carta_BeloHorizonte.populacao * 1000000 + carta_BeloHorizonte.area + carta_BeloHorizonte.pib +
                                       carta_BeloHorizonte.pontos_turisticos + carta_BeloHorizonte.pib_per_capita +
                                       (carta_BeloHorizonte.densidade_populacional != 0.0f ? 1.0f / carta_BeloHorizonte.densidade_populacional : 0.0f);
@@ -262,14 +234,10 @@ int main(void) {
     carta_Curitiba.area = 435.0;
     carta_Curitiba.pib = 150.0;
     carta_Curitiba.pontos_turisticos = 3;
-    if (carta_Curitiba.area != 0.0f)
-        carta_Curitiba.densidade_populacional = carta_Curitiba.populacao * 1000000 / carta_Curitiba.area;
-    else
-        carta_Curitiba.densidade_populacional = 0.0f;
-    if (carta_Curitiba.populacao != 0.0f)
-        carta_Curitiba.pib_per_capita = (carta_Curitiba.pib * 1000000000) / (carta_Curitiba.populacao * 1000000);
-    else
-        carta_Curitiba.pib_per_capita = 0.0f;
+    carta_Curitiba.densidade_populacional = (carta_Curitiba.area != 0.0f) ? 
+        (carta_Curitiba.populacao * 1000000 / carta_Curitiba.area) : 0.0f;
+    carta_Curitiba.pib_per_capita = (carta_Curitiba.populacao != 0.0f) ?
+        ((carta_Curitiba.pib * 1000000000) / (carta_Curitiba.populacao * 1000000)) : 0.0f;
     carta_Curitiba.super_poder = carta_Curitiba.populacao * 1000000 + carta_Curitiba.area + carta_Curitiba.pib +
                                  carta_Curitiba.pontos_turisticos + carta_Curitiba.pib_per_capita +
                                  (carta_Curitiba.densidade_populacional != 0.0f ? 1.0f / carta_Curitiba.densidade_populacional : 0.0f);
@@ -281,14 +249,10 @@ int main(void) {
     carta_jogador_A.area = 0.0;
     carta_jogador_A.pib = 0.0;
     carta_jogador_A.pontos_turisticos = 0;
-    if (carta_jogador_A.area != 0.0f)
-        carta_jogador_A.densidade_populacional = carta_jogador_A.populacao * 1000000 / carta_jogador_A.area;
-    else
-        carta_jogador_A.densidade_populacional = 0.0f;
-    if (carta_jogador_A.populacao != 0.0f)
-        carta_jogador_A.pib_per_capita = (carta_jogador_A.pib * 1000000000) / (carta_jogador_A.populacao * 1000000);
-    else
-        carta_jogador_A.pib_per_capita = 0.0f;
+    carta_jogador_A.densidade_populacional = (carta_jogador_A.area != 0.0f) ? 
+        (carta_jogador_A.populacao * 1000000 / carta_jogador_A.area) : 0.0f;
+    carta_jogador_A.pib_per_capita = (carta_jogador_A.populacao != 0.0f) ?
+        ((carta_jogador_A.pib * 1000000000) / (carta_jogador_A.populacao * 1000000)) : 0.0f;
     carta_jogador_A.super_poder = carta_jogador_A.populacao * 1000000 + carta_jogador_A.area + carta_jogador_A.pib +
                                   carta_jogador_A.pontos_turisticos + carta_jogador_A.pib_per_capita +
                                   (carta_jogador_A.densidade_populacional != 0.0f ? 1.0f / carta_jogador_A.densidade_populacional : 0.0f);
@@ -300,14 +264,10 @@ int main(void) {
     carta_jogador_B.area = 0.0;
     carta_jogador_B.pib = 0.0;
     carta_jogador_B.pontos_turisticos = 0;
-    if (carta_jogador_B.area != 0.0f)
-        carta_jogador_B.densidade_populacional = carta_jogador_B.populacao * 1000000 / carta_jogador_B.area;
-    else
-        carta_jogador_B.densidade_populacional = 0.0f;
-    if (carta_jogador_B.populacao != 0.0f)
-        carta_jogador_B.pib_per_capita = (carta_jogador_B.pib * 1000000000) / (carta_jogador_B.populacao * 1000000);
-    else
-        carta_jogador_B.pib_per_capita = 0.0f;
+    carta_jogador_B.densidade_populacional = (carta_jogador_B.area != 0.0f) ? 
+        (carta_jogador_B.populacao * 1000000 / carta_jogador_B.area) : 0.0f;
+    carta_jogador_B.pib_per_capita = (carta_jogador_B.populacao != 0.0f) ?
+        ((carta_jogador_B.pib * 1000000000) / (carta_jogador_B.populacao * 1000000)) : 0.0f;
     carta_jogador_B.super_poder = carta_jogador_B.populacao * 1000000 + carta_jogador_B.area + carta_jogador_B.pib +
                                   carta_jogador_B.pontos_turisticos + carta_jogador_B.pib_per_capita +
                                   (carta_jogador_B.densidade_populacional != 0.0f ? 1.0f / carta_jogador_B.densidade_populacional : 0.0f);
@@ -455,84 +415,70 @@ int main(void) {
                                     printf("Atributo escolhido: População\n");
                                     printf("Jogador A: %d milhões\n", int_populacao_jogador_A);
                                     printf("Jogador B: %d milhões\n", int_populacao_jogador_B);
-                                    if (int_populacao_jogador_A > int_populacao_jogador_B)
-                                        printf("Jogador A venceu na população!\n");
-                                    else if (int_populacao_jogador_A < int_populacao_jogador_B)
-                                        printf("Jogador B venceu na população!\n");
-                                    else
-                                        printf("Empate na população!\n");
+                                    printf("%s\n", 
+                                        int_populacao_jogador_A > int_populacao_jogador_B ? "Jogador A venceu na população!" :
+                                        int_populacao_jogador_A < int_populacao_jogador_B ? "Jogador B venceu na população!" :
+                                        "Empate na população!");
                                     break;
                                 }
                                 case 2:{ // Área
                                     printf("Atributo escolhido: Área\n");
                                     printf("Jogador A: %.2f km²\n", float_area_jogador_A);
                                     printf("Jogador B: %.2f km²\n", float_area_jogador_B);
-                                    if (float_area_jogador_A > float_area_jogador_B)
-                                        printf("Jogador A venceu na área!\n");
-                                    else if (float_area_jogador_A < float_area_jogador_B)
-                                        printf("Jogador B venceu na área!\n");
-                                    else
-                                        printf("Empate na área!\n");
+                                    printf("%s\n",
+                                        float_area_jogador_A > float_area_jogador_B ? "Jogador A venceu na área!" :
+                                        float_area_jogador_A < float_area_jogador_B ? "Jogador B venceu na área!" :
+                                        "Empate na área!");
                                     break;
                                 }
                                 case 3: {
                                     printf("Atributo escolhido: Densidade populacional\n");
                                     printf("Jogador A: %.2f hab/km²\n", densidade_A);
                                     printf("Jogador B: %.2f hab/km²\n", densidade_B);
-                                    if (densidade_A < densidade_B)
-                                        printf("Jogador A venceu na densidade populacional!\n");
-                                    else if (densidade_A > densidade_B)
-                                        printf("Jogador B venceu na densidade populacional!\n");
-                                    else
-                                        printf("Empate na densidade populacional!\n");
+                                    printf("%s\n",
+                                        densidade_A < densidade_B ? "Jogador A venceu na densidade populacional!" :
+                                        densidade_A > densidade_B ? "Jogador B venceu na densidade populacional!" :
+                                        "Empate na densidade populacional!");
                                     break;
                                 }
                                 case 4:{
                                     printf("Atributo escolhido: PIB\n");
                                     printf("Jogador A: %.2f bilhões\n", float_pib_jogador_A);
                                     printf("Jogador B: %.2f bilhões\n", float_pib_jogador_B);
-                                    if (float_pib_jogador_A > float_pib_jogador_B)
-                                        printf("Jogador A venceu no PIB!\n");
-                                    else if (float_pib_jogador_A < float_pib_jogador_B)
-                                        printf("Jogador B venceu no PIB!\n");
-                                    else
-                                    printf("Empate no PIB!\n");
+                                    printf("%s\n",
+                                        float_pib_jogador_A > float_pib_jogador_B ? "Jogador A venceu no PIB!" :
+                                        float_pib_jogador_A < float_pib_jogador_B ? "Jogador B venceu no PIB!" :
+                                        "Empate no PIB!");
                                     break;
                                 }
                                 case 5: {
                                     printf("Atributo escolhido: PIB per capita\n");
                                     printf("Jogador A: R$ %.2f\n", per_capita_A);
                                     printf("Jogador B: R$ %.2f\n", per_capita_B);
-                                    if (per_capita_A > per_capita_B)
-                                        printf("Jogador A venceu no PIB per capita!\n");
-                                    else if (per_capita_A < per_capita_B)
-                                        printf("Jogador B venceu no PIB per capita!\n");
-                                    else
-                                        printf("Empate no PIB per capita!\n");
+                                    printf("%s\n",
+                                        per_capita_A > per_capita_B ? "Jogador A venceu no PIB per capita!" :
+                                        per_capita_A < per_capita_B ? "Jogador B venceu no PIB per capita!" :
+                                        "Empate no PIB per capita!");
                                     break;
                                 }
                                 case 6:{
                                     printf("Atributo escolhido: Pontos turísticos\n");
                                     printf("Jogador A: %d pontos\n", qtde_pontos_turisticos_jogador_A);
                                     printf("Jogador B: %d pontos\n", qtde_pontos_turisticos_jogador_B);
-                                    if (qtde_pontos_turisticos_jogador_A > qtde_pontos_turisticos_jogador_B)
-                                        printf("Jogador A venceu nos pontos turísticos!\n");
-                                    else if (qtde_pontos_turisticos_jogador_A < qtde_pontos_turisticos_jogador_B)
-                                        printf("Jogador B venceu nos pontos turísticos!\n");
-                                    else
-                                        printf("Empate nos pontos turísticos!\n");
+                                    printf("%s\n",
+                                        qtde_pontos_turisticos_jogador_A > qtde_pontos_turisticos_jogador_B ? "Jogador A venceu nos pontos turísticos!" :
+                                        qtde_pontos_turisticos_jogador_A < qtde_pontos_turisticos_jogador_B ? "Jogador B venceu nos pontos turísticos!" :
+                                        "Empate nos pontos turísticos!");
                                     break;
                                 }
                                 case 7: {
                                     printf("Atributo escolhido: Super Poder\n");
                                     printf("Jogador A: %.2f pontos\n", super_poder_A);
                                     printf("Jogador B: %.2f pontos\n", super_poder_B);
-                                    if (super_poder_A > super_poder_B)
-                                        printf("Jogador A venceu no Super Poder!\n");
-                                    else if (super_poder_A < super_poder_B)
-                                        printf("Jogador B venceu no Super Poder!\n");
-                                    else
-                                        printf("Empate no Super Poder!\n");
+                                    printf("%s\n",
+                                        super_poder_A > super_poder_B ? "Jogador A venceu no Super Poder!" :
+                                        super_poder_A < super_poder_B ? "Jogador B venceu no Super Poder!" :
+                                        "Empate no Super Poder!");
                                     break;
                                 }
                                 default:{
