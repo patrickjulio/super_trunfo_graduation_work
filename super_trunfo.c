@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 //Identificadores de atributos - correspondem aos números mostrados no menu
 #define IDX_POPULACAO 1      // opção 1 no menu
@@ -11,6 +12,110 @@
 #define IDX_PIB_PER_CAPITA 5 // opção 5 no menu
 #define IDX_PONTOS_TURISTICOS 6 // opção 6 no menu
 #define IDX_SUPER_PODER 7    // opção 7 no menu
+
+// Função para exibir o menu de atributos
+void exibir_menu_atributos(bool atributos_disponiveis[]) {
+    printf("\nAtributos disponíveis para comparação:\n");
+    if (atributos_disponiveis[IDX_POPULACAO]) printf("%d. População\n", IDX_POPULACAO);
+    if (atributos_disponiveis[IDX_AREA]) printf("%d. Área\n", IDX_AREA);
+    if (atributos_disponiveis[IDX_DENSIDADE]) printf("%d. Densidade Populacional\n", IDX_DENSIDADE);
+    if (atributos_disponiveis[IDX_PIB]) printf("%d. PIB\n", IDX_PIB);
+    if (atributos_disponiveis[IDX_PIB_PER_CAPITA]) printf("%d. PIB per capita\n", IDX_PIB_PER_CAPITA);
+    if (atributos_disponiveis[IDX_PONTOS_TURISTICOS]) printf("%d. Pontos Turísticos\n", IDX_PONTOS_TURISTICOS);
+}
+
+// Função para verificar se um atributo é válido
+bool atributo_valido(int atributo, bool atributos_disponiveis[]) {
+    if (atributo < 1 || atributo > 7) return false;
+    return atributos_disponiveis[atributo];
+}
+
+// Função para comparar cartas com base em dois atributos
+void comparar_cartas_dois_atributos(Carta* carta1, Carta* carta2, int atributo1, int atributo2) {
+    float valor1_atrib1 = acessarAtributo(carta1, atributo1);
+    float valor2_atrib1 = acessarAtributo(carta2, atributo1);
+    float valor1_atrib2 = acessarAtributo(carta1, atributo2);
+    float valor2_atrib2 = acessarAtributo(carta2, atributo2);
+    
+    // Pontuação para cada carta (começa em 0)
+    int pontos_carta1 = 0;
+    int pontos_carta2 = 0;
+    
+    // Compara primeiro atributo
+    printf("\nComparando primeiro atributo:\n");
+    if (atributo1 == IDX_DENSIDADE) {
+        // Para densidade, menor valor vence
+        if (valor1_atrib1 < valor2_atrib1) {
+            pontos_carta1++;
+            printf("%s vence no primeiro atributo!\n", carta1->cidade);
+        } else if (valor2_atrib1 < valor1_atrib1) {
+            pontos_carta2++;
+            printf("%s vence no primeiro atributo!\n", carta2->cidade);
+        } else {
+            printf("Empate no primeiro atributo!\n");
+        }
+    } else {
+        // Para outros atributos, maior valor vence
+        if (valor1_atrib1 > valor2_atrib1) {
+            pontos_carta1++;
+            printf("%s vence no primeiro atributo!\n", carta1->cidade);
+        } else if (valor2_atrib1 > valor1_atrib1) {
+            pontos_carta2++;
+            printf("%s vence no primeiro atributo!\n", carta2->cidade);
+        } else {
+            printf("Empate no primeiro atributo!\n");
+        }
+    }
+    
+    // Compara segundo atributo
+    printf("\nComparando segundo atributo:\n");
+    if (atributo2 == IDX_DENSIDADE) {
+        // Para densidade, menor valor vence
+        if (valor1_atrib2 < valor2_atrib2) {
+            pontos_carta1++;
+            printf("%s vence no segundo atributo!\n", carta1->cidade);
+        } else if (valor2_atrib2 < valor1_atrib2) {
+            pontos_carta2++;
+            printf("%s vence no segundo atributo!\n", carta2->cidade);
+        } else {
+            printf("Empate no segundo atributo!\n");
+        }
+    } else {
+        // Para outros atributos, maior valor vence
+        if (valor1_atrib2 > valor2_atrib2) {
+            pontos_carta1++;
+            printf("%s vence no segundo atributo!\n", carta1->cidade);
+        } else if (valor2_atrib2 > valor1_atrib2) {
+            pontos_carta2++;
+            printf("%s vence no segundo atributo!\n", carta2->cidade);
+        } else {
+            printf("Empate no segundo atributo!\n");
+        }
+    }
+    
+    // Calcula e mostra a soma dos atributos
+    float soma_carta1 = valor1_atrib1 + valor1_atrib2;
+    float soma_carta2 = valor2_atrib1 + valor2_atrib2;
+    
+    printf("\nSoma dos atributos:\n");
+    printf("%s: %.2f\n", carta1->cidade, soma_carta1);
+    printf("%s: %.2f\n", carta2->cidade, soma_carta2);
+    
+    // Determina o vencedor
+    if (pontos_carta1 > pontos_carta2) {
+        printf("\n%s vence a rodada!\n", carta1->cidade);
+    } else if (pontos_carta2 > pontos_carta1) {
+        printf("\n%s vence a rodada!\n", carta2->cidade);
+    } else {
+        if (soma_carta1 > soma_carta2) {
+            printf("\n%s vence a rodada por maior soma dos atributos!\n", carta1->cidade);
+        } else if (soma_carta2 > soma_carta1) {
+            printf("\n%s vence a rodada por maior soma dos atributos!\n", carta2->cidade);
+        } else {
+            printf("\nEmpate total!\n");
+        }
+    }
+}
 
 // Função utilitária para limpar o buffer de entrada
 // ou coletar a tecla Enter, recurso comum para ir
@@ -87,18 +192,24 @@ int main(void) {
             "        SELEÇÃO DE MODO DE JOGO\n"
             "========================================\n"
             "Vamos começar!\n"
-            "1 - Entrada de dados pela CPU (modo demonstrativo)\n"
-            "2 - Entrada de dados pelos usuários com atributo aleatório\n"
+            "1 - Modo com dois atributos (escolha manual)\n"
+            "2 - Modo demonstrativo (CPU escolhe cartas e atributo)\n"
             "3 - Voltar ao menu inicial\n"
-            "Escolha o modo de entrada de dados com o dígito correspondente (1-3):\n",
+            "Escolha o modo de jogo com o dígito correspondente (1-3):\n",
 
         .regras =
             "\n========================================\n"
             "                REGRAS                 \n"
-            "1. Cada jogador escolhe ou cria uma carta com atributos de uma cidade.\n"
-            "2. No modo demonstrativo a CPU escolhe um atributo aleatório para comparar.\n"
-            "3. No modo usuário, cada jogador escolhe dois atributos.\n"
-            "4. A carta com o maior valor no atributo (modo demonstrativo) ou soma dos atributos (modo usuário) ganha.\n"
+            "1. Cada jogador escolhe uma carta de cidade dentre as disponíveis.\n"
+            "2. No modo com dois atributos:\n"
+            "   - Você escolhe dois atributos diferentes para comparar\n"
+            "   - Cada atributo é comparado separadamente\n"
+            "   - A carta que vencer em mais atributos ganha\n"
+            "   - Em caso de empate, vence a maior soma dos atributos\n"
+            "3. No modo demonstrativo:\n"
+            "   - A CPU escolhe as cartas e um atributo aleatório\n"
+            "   - Vence a carta com maior valor no atributo escolhido\n"
+            "4. Exceção: Para Densidade Populacional, vence o MENOR valor\n"
             "========================================\n"
             "Digite 1 e clique Enter para voltar ao menu inicial:\n",
 
@@ -340,7 +451,121 @@ int main(void) {
                         }
                     }
                     switch (escolha_jogo){
-                        case 1:{ // CPU modo demonstrativo (escolhe duas cartas prontas de 08 cartas)
+                        case 1:{ // Modo com dois atributos selecionados pelo usuário
+                            printf("\nModo com dois atributos selecionado.\n");
+                            printf("\n========================================\n");
+                            printf("     MODO COM DOIS ATRIBUTOS           \n");
+                            printf("========================================\n\n");
+
+                            // Array para controlar quais atributos estão disponíveis
+                            bool atributos_disponiveis[8] = {false, true, true, true, true, true, true, true};
+                            // O primeiro elemento é falso por não haver atributo 0 na interface do usuário
+                            
+                            // Escolha do primeiro atributo
+                            int atributo1 = -1;
+                            while (1) {
+                                exibir_menu_atributos(atributos_disponiveis);
+                                printf("\nEscolha o primeiro atributo (1-7): ");
+                                if (scanf("%d", &atributo1) != 1) {
+                                    limpar_buffer_ate_enter();
+                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 7.\n");
+                                    continue;
+                                }
+                                if (atributo_valido(atributo1, atributos_disponiveis)) {
+                                    break;
+                                }
+                                printf("Atributo inválido. Por favor, escolha um dos atributos disponíveis.\n");
+                            }
+
+                            // Marcar o primeiro atributo como indisponível
+                            atributos_disponiveis[atributo1] = false;
+
+                            // Escolha do segundo atributo
+                            int atributo2 = -1;
+                            while (1) {
+                                printf("\nAtributo 1 selecionado. Agora escolha o segundo atributo:\n");
+                                exibir_menu_atributos(atributos_disponiveis);
+                                printf("\nEscolha o segundo atributo (1-7): ");
+                                if (scanf("%d", &atributo2) != 1) {
+                                    limpar_buffer_ate_enter();
+                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 7.\n");
+                                    continue;
+                                }
+                                if (atributo_valido(atributo2, atributos_disponiveis)) {
+                                    break;
+                                }
+                                printf("Atributo inválido ou já escolhido. Por favor, escolha outro atributo.\n");
+                            }
+
+                            // Escolha das cartas
+                            printf("\nEscolha a carta para o Jogador 1:\n");
+                            printf("1. Manaus\n2. São Paulo\n3. Rio de Janeiro\n4. Brasília\n");
+                            printf("5. Salvador\n6. Fortaleza\n7. Belo Horizonte\n8. Curitiba\n");
+                            
+                            while (1) {
+                                if (scanf("%d", &carta_escolhida_jogador_1) != 1) {
+                                    limpar_buffer_ate_enter();
+                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 8:\n");
+                                    continue;
+                                }
+                                if (carta_escolhida_jogador_1 >= 1 && carta_escolhida_jogador_1 <= 8) {
+                                    carta_escolhida_jogador_1--; // Ajusta para índice 0-7
+                                    break;
+                                }
+                                printf("Carta inválida. Por favor, escolha um número entre 1 e 8.\n");
+                            }
+
+                            printf("\nEscolha a carta para o Jogador 2:\n");
+                            while (1) {
+                                if (scanf("%d", &carta_escolhida_jogador_2) != 1) {
+                                    limpar_buffer_ate_enter();
+                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 8:\n");
+                                    continue;
+                                }
+                                carta_escolhida_jogador_2--; // Ajusta para índice 0-7
+                                if (carta_escolhida_jogador_2 >= 0 && carta_escolhida_jogador_2 <= 7 && 
+                                    carta_escolhida_jogador_2 != carta_escolhida_jogador_1) {
+                                    break;
+                                }
+                                carta_escolhida_jogador_2++; // Reverte o ajuste para mostrar mensagem
+                                printf("Carta inválida ou já escolhida. Por favor, escolha outra carta.\n");
+                            }
+
+                            // Mapear os índices para os ponteiros das cartas
+                            Carta *selA = NULL, *selB = NULL;
+                            switch (carta_escolhida_jogador_1) {
+                                case 0: selA = &carta_Manaus; break;
+                                case 1: selA = &carta_SaoPaulo; break;
+                                case 2: selA = &carta_RioDeJaneiro; break;
+                                case 3: selA = &carta_Brasilia; break;
+                                case 4: selA = &carta_Salvador; break;
+                                case 5: selA = &carta_Fortaleza; break;
+                                case 6: selA = &carta_BeloHorizonte; break;
+                                case 7: selA = &carta_Curitiba; break;
+                                default: selA = &carta_Manaus; break;
+                            }
+                            switch (carta_escolhida_jogador_2) {
+                                case 0: selB = &carta_Manaus; break;
+                                case 1: selB = &carta_SaoPaulo; break;
+                                case 2: selB = &carta_RioDeJaneiro; break;
+                                case 3: selB = &carta_Brasilia; break;
+                                case 4: selB = &carta_Salvador; break;
+                                case 5: selB = &carta_Fortaleza; break;
+                                case 6: selB = &carta_BeloHorizonte; break;
+                                case 7: selB = &carta_Curitiba; break;
+                                default: selB = &carta_SaoPaulo; break;
+                            }
+
+                            printf("\nComparando as cartas com os atributos escolhidos:\n");
+                            comparar_cartas_dois_atributos(selA, selB, atributo1, atributo2);
+
+                            printf("\nPressione Enter para continuar...");
+                            limpar_buffer_ate_enter();
+                            getchar();
+                            tela_atual = 1; // Volta para o menu inicial
+                            break;
+                        }
+                        case 2:{ // CPU modo demonstrativo (escolhe duas cartas prontas de 08 cartas)
                             printf("\nModo demonstrativo selecionado.\n");
                             printf("\n========================================\n");
                             printf("          MODO DEMONSTRATIVO           \n");
