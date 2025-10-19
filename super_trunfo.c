@@ -126,12 +126,12 @@ void limpar_buffer_ate_enter() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// Definição do tipo Carta (colocada em escopo global)
+// Definição do tipo Carta
 typedef struct {
-    char cidade[33]; // Nome da cidade (máx 32 caracteres + '\0')
-    float populacao;   // População em milhões
-    float area;     // Área em km²
-    float pib;      // PIB em bilhões
+    char cidade[33];    // Nome da cidade (máx 32 caracteres + '\0')
+    float populacao;    // População em milhões
+    float area;         // Área em km²
+    float pib;         // PIB em bilhões
     int pontos_turisticos; // Quantidade de pontos turísticos
     float densidade_populacional; // População por km²
     float pib_per_capita; // PIB per capita
@@ -156,6 +156,17 @@ float acessarAtributo(Carta* carta, int indice) {
 // Função para acessar o nome da cidade
 const char* acessarNomeCidade(Carta* carta) {
     return carta->cidade;
+}
+
+// Função para exibir uma carta no formato solicitado
+void exibir_carta(Carta* carta, int numero_carta) {
+    printf("\nCarta %d:\n", numero_carta);
+    printf("Nome da Cidade: %s\n", carta->cidade);
+    printf("População: %.0f habitantes\n", carta->populacao * 1000000); // Convertendo de milhões para unidades
+    printf("Área: %.2f km²\n", carta->area);
+    printf("PIB: %.2f bilhões de reais\n", carta->pib);
+    printf("Número de Pontos Turísticos: %d\n", carta->pontos_turisticos);
+    printf("\nEssa é a carta que você deseja? (S/N): ");
 }
 
 // Função principal
@@ -460,7 +471,7 @@ int main(void) {
                             // Array para controlar quais atributos estão disponíveis
                             bool atributos_disponiveis[8] = {false, true, true, true, true, true, true, true};
                             // O primeiro elemento é falso por não haver atributo 0 na interface do usuário
-                            
+
                             // Escolha do primeiro atributo
                             int atributo1 = -1;
                             while (1) {
@@ -510,7 +521,26 @@ int main(void) {
                                 }
                                 if (carta_escolhida_jogador_1 >= 1 && carta_escolhida_jogador_1 <= 8) {
                                     carta_escolhida_jogador_1--; // Ajusta para índice 0-7
+                                       // Mostra os detalhes da carta escolhida
+                                       switch (carta_escolhida_jogador_1) {
+                                           case 0: exibir_carta(&carta_Manaus, 1); break;
+                                           case 1: exibir_carta(&carta_SaoPaulo, 1); break;
+                                           case 2: exibir_carta(&carta_RioDeJaneiro, 1); break;
+                                           case 3: exibir_carta(&carta_Brasilia, 1); break;
+                                           case 4: exibir_carta(&carta_Salvador, 1); break;
+                                           case 5: exibir_carta(&carta_Fortaleza, 1); break;
+                                           case 6: exibir_carta(&carta_BeloHorizonte, 1); break;
+                                           case 7: exibir_carta(&carta_Curitiba, 1); break;
+                                       }
+                                       char confirmacao;
+                                       scanf(" %c", &confirmacao);
+                                       if (confirmacao == 'S' || confirmacao == 's') {
                                     break;
+                                       }
+                                       printf("\nEscolha outra carta:\n");
+                                       printf("1. Manaus\n2. São Paulo\n3. Rio de Janeiro\n4. Brasília\n");
+                                       printf("5. Salvador\n6. Fortaleza\n7. Belo Horizonte\n8. Curitiba\n");
+                                       continue;
                                 }
                                 printf("Carta inválida. Por favor, escolha um número entre 1 e 8.\n");
                             }
@@ -525,7 +555,26 @@ int main(void) {
                                 carta_escolhida_jogador_2--; // Ajusta para índice 0-7
                                 if (carta_escolhida_jogador_2 >= 0 && carta_escolhida_jogador_2 <= 7 && 
                                     carta_escolhida_jogador_2 != carta_escolhida_jogador_1) {
+                                       // Mostra os detalhes da carta escolhida
+                                       switch (carta_escolhida_jogador_2) {
+                                           case 0: exibir_carta(&carta_Manaus, 2); break;
+                                           case 1: exibir_carta(&carta_SaoPaulo, 2); break;
+                                           case 2: exibir_carta(&carta_RioDeJaneiro, 2); break;
+                                           case 3: exibir_carta(&carta_Brasilia, 2); break;
+                                           case 4: exibir_carta(&carta_Salvador, 2); break;
+                                           case 5: exibir_carta(&carta_Fortaleza, 2); break;
+                                           case 6: exibir_carta(&carta_BeloHorizonte, 2); break;
+                                           case 7: exibir_carta(&carta_Curitiba, 2); break;
+                                       }
+                                       char confirmacao;
+                                       scanf(" %c", &confirmacao);
+                                       if (confirmacao == 'S' || confirmacao == 's') {
                                     break;
+                                       }
+                                       printf("\nEscolha outra carta:\n");
+                                       printf("1. Manaus\n2. São Paulo\n3. Rio de Janeiro\n4. Brasília\n");
+                                       printf("5. Salvador\n6. Fortaleza\n7. Belo Horizonte\n8. Curitiba\n");
+                                       continue;
                                 }
                                 carta_escolhida_jogador_2++; // Reverte o ajuste para mostrar mensagem
                                 printf("Carta inválida ou já escolhida. Por favor, escolha outra carta.\n");
