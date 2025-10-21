@@ -1,8 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <stdbool.h>
+
+// Definição do tipo Carta
+typedef struct {
+    char cidade[33];    // Nome da cidade (máx 32 caracteres + '\0')
+    unsigned long int populacao;    // População em milhões
+    float area;         // Área em km²
+    float pib;         // PIB em bilhões
+    int pontos_turisticos; // Quantidade de pontos turísticos
+    float densidade_populacional; // População por km²
+    float pib_per_capita; // PIB per capita
+    float super_poder; // Soma dos atributos para o modo usuário
+} Carta;
+
+    // Declarações forward das funções
+    float acessarAtributo(Carta* carta, int indice);
+    void exibir_carta(Carta* carta, int numero_carta);
+    void limpar_buffer_ate_enter();
+    const char* nome_atributo(int atributo);
+    int compara_atributo(Carta* c1, Carta* c2, int atributo);
+    void listar_cidades(Carta* baralho[], int tamanho);
+    void listar_cidades_disponiveis(Carta* baralho[], int tamanho, int carta_excluida);
 
 //Identificadores de atributos - correspondem aos números mostrados no menu
 #define IDX_POPULACAO 1      // opção 1 no menu
@@ -15,13 +35,13 @@
 
 // Função para exibir o menu de atributos
 void exibir_menu_atributos(bool atributos_disponiveis[]) {
-    printf("\nAtributos disponíveis para comparação:\n");
     if (atributos_disponiveis[IDX_POPULACAO]) printf("%d. População\n", IDX_POPULACAO);
     if (atributos_disponiveis[IDX_AREA]) printf("%d. Área\n", IDX_AREA);
     if (atributos_disponiveis[IDX_DENSIDADE]) printf("%d. Densidade Populacional\n", IDX_DENSIDADE);
     if (atributos_disponiveis[IDX_PIB]) printf("%d. PIB\n", IDX_PIB);
     if (atributos_disponiveis[IDX_PIB_PER_CAPITA]) printf("%d. PIB per capita\n", IDX_PIB_PER_CAPITA);
     if (atributos_disponiveis[IDX_PONTOS_TURISTICOS]) printf("%d. Pontos Turísticos\n", IDX_PONTOS_TURISTICOS);
+    if (atributos_disponiveis[IDX_SUPER_PODER]) printf("%d. Super Poder\n", IDX_SUPER_PODER);
 }
 
 // Função para verificar se um atributo é válido
@@ -30,103 +50,89 @@ bool atributo_valido(int atributo, bool atributos_disponiveis[]) {
     return atributos_disponiveis[atributo];
 }
 
+// Nome legível do atributo
+const char* nome_atributo(int atributo) {
+    switch (atributo) {
+        case IDX_POPULACAO: return "População";
+        case IDX_AREA: return "Área";
+        case IDX_DENSIDADE: return "Densidade Populacional";
+        case IDX_PIB: return "PIB";
+        case IDX_PIB_PER_CAPITA: return "PIB per Capita";
+        case IDX_PONTOS_TURISTICOS: return "Pontos Turísticos";
+        case IDX_SUPER_PODER: return "Super Poder";
+        default: return "Atributo";
+    }
+}
+
+// Compara um atributo específico entre duas cartas
+// Retorna: 1 se carta1 vence, 2 se carta2 vence, 0 se empate
+int compara_atributo(Carta* c1, Carta* c2, int atributo) {
+    float v1 = acessarAtributo(c1, atributo);
+    float v2 = acessarAtributo(c2, atributo);
+    bool menor_vence = (atributo == IDX_DENSIDADE);
+    if (v1 == v2) return 0;
+    if (menor_vence) return (v1 < v2) ? 1 : 2;
+    return (v1 > v2) ? 1 : 2;
+}
+
+// Lista as cidades disponíveis
+void listar_cidades(Carta* baralho[], int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        printf("%d. %s\n", i + 1, baralho[i]->cidade);
+    }
+}
+
+// Lista as cidades disponíveis excluindo uma carta já escolhida
+void listar_cidades_disponiveis(Carta* baralho[], int tamanho, int carta_excluida) {
+    for (int i = 0; i < tamanho; i++) {
+        if (i != carta_excluida) {
+            printf("%d. %s\n", i + 1, baralho[i]->cidade);
+        }
+    }
+}
+
 // Função para comparar cartas com base em dois atributos
-void comparar_cartas_dois_atributos(Carta* carta1, Carta* carta2, int atributo1, int atributo2) {
+void comparar_cartas_dois_atributos(Carta* carta1, Carta* carta2, int atributo1, int atributo2, int jogador1, int jogador2) {
     float valor1_atrib1 = acessarAtributo(carta1, atributo1);
     float valor2_atrib1 = acessarAtributo(carta2, atributo1);
     float valor1_atrib2 = acessarAtributo(carta1, atributo2);
     float valor2_atrib2 = acessarAtributo(carta2, atributo2);
-    
-    // Pontuação para cada carta (começa em 0)
+
     int pontos_carta1 = 0;
     int pontos_carta2 = 0;
-    
-    // Compara primeiro atributo
+
     printf("\nComparando primeiro atributo:\n");
-    const char* nome_atrib1 = NULL;
-    switch (atributo1) {
-        case IDX_POPULACAO: nome_atrib1 = "População"; break;
-        case IDX_AREA: nome_atrib1 = "Área"; break;
-        case IDX_DENSIDADE: nome_atrib1 = "Densidade Populacional"; break;
-        case IDX_PIB: nome_atrib1 = "PIB"; break;
-        case IDX_PIB_PER_CAPITA: nome_atrib1 = "PIB per Capita"; break;
-        case IDX_PONTOS_TURISTICOS: nome_atrib1 = "Pontos Turísticos"; break;
-        default: nome_atrib1 = "Atributo"; break;
+    const char* nome1 = nome_atributo(atributo1);
+    switch (compara_atributo(carta1, carta2, atributo1)) {
+        case 1: pontos_carta1++; printf("Carta %s do Jogador %d venceu carta %s do Jogador %d no atributo %s\n", carta1->cidade, jogador1, carta2->cidade, jogador2, nome1); break;
+        case 2: pontos_carta2++; printf("Carta %s do Jogador %d venceu carta %s do Jogador %d no atributo %s\n", carta2->cidade, jogador2, carta1->cidade, jogador1, nome1); break;
+        default: printf("Empate no atributo %s\n", nome1); break;
     }
-    if (atributo1 == IDX_DENSIDADE) {
-        if (valor1_atrib1 < valor2_atrib1) {
-            pontos_carta1++;
-            printf("Carta 1 venceu Carta 2 no atributo %s\n", nome_atrib1);
-        } else if (valor2_atrib1 < valor1_atrib1) {
-            pontos_carta2++;
-            printf("Carta 2 venceu Carta 1 no atributo %s\n", nome_atrib1);
-        } else {
-            printf("Empate no atributo %s\n", nome_atrib1);
-        }
-    } else {
-        if (valor1_atrib1 > valor2_atrib1) {
-            pontos_carta1++;
-            printf("Carta 1 venceu Carta 2 no atributo %s\n", nome_atrib1);
-        } else if (valor2_atrib1 > valor1_atrib1) {
-            pontos_carta2++;
-            printf("Carta 2 venceu Carta 1 no atributo %s\n", nome_atrib1);
-        } else {
-            printf("Empate no atributo %s\n", nome_atrib1);
-        }
-    }
-    
-    // Compara segundo atributo
+
     printf("\nComparando segundo atributo:\n");
-    const char* nome_atrib2 = NULL;
-    switch (atributo2) {
-        case IDX_POPULACAO: nome_atrib2 = "População"; break;
-        case IDX_AREA: nome_atrib2 = "Área"; break;
-        case IDX_DENSIDADE: nome_atrib2 = "Densidade Populacional"; break;
-        case IDX_PIB: nome_atrib2 = "PIB"; break;
-        case IDX_PIB_PER_CAPITA: nome_atrib2 = "PIB per Capita"; break;
-        case IDX_PONTOS_TURISTICOS: nome_atrib2 = "Pontos Turísticos"; break;
-        default: nome_atrib2 = "Atributo"; break;
+    const char* nome2 = nome_atributo(atributo2);
+    switch (compara_atributo(carta1, carta2, atributo2)) {
+        case 1: pontos_carta1++; printf("Carta %s do Jogador %d venceu carta %s do Jogador %d no atributo %s\n", carta1->cidade, jogador1, carta2->cidade, jogador2, nome2); break;
+        case 2: pontos_carta2++; printf("Carta %s do Jogador %d venceu carta %s do Jogador %d no atributo %s\n", carta2->cidade, jogador2, carta1->cidade, jogador1, nome2); break;
+        default: printf("Empate no atributo %s\n", nome2); break;
     }
-    if (atributo2 == IDX_DENSIDADE) {
-        if (valor1_atrib2 < valor2_atrib2) {
-            pontos_carta1++;
-            printf("Carta 1 venceu Carta 2 no atributo %s\n", nome_atrib2);
-        } else if (valor2_atrib2 < valor1_atrib2) {
-            pontos_carta2++;
-            printf("Carta 2 venceu Carta 1 no atributo %s\n", nome_atrib2);
-        } else {
-            printf("Empate no atributo %s\n", nome_atrib2);
-        }
-    } else {
-        if (valor1_atrib2 > valor2_atrib2) {
-            pontos_carta1++;
-            printf("Carta 1 venceu Carta 2 no atributo %s\n", nome_atrib2);
-        } else if (valor2_atrib2 > valor1_atrib2) {
-            pontos_carta2++;
-            printf("Carta 2 venceu Carta 1 no atributo %s\n", nome_atrib2);
-        } else {
-            printf("Empate no atributo %s\n", nome_atrib2);
-        }
-    }
-    
-    // Calcula e mostra a soma dos atributos
+
     float soma_carta1 = valor1_atrib1 + valor1_atrib2;
     float soma_carta2 = valor2_atrib1 + valor2_atrib2;
-    
+
     printf("\nSoma dos atributos:\n");
     printf("%s: %.2f\n", carta1->cidade, soma_carta1);
     printf("%s: %.2f\n", carta2->cidade, soma_carta2);
-    
-    // Determina o vencedor da rodada (mensagem simples)
+
     if (pontos_carta1 > pontos_carta2) {
-        printf("\nCarta 1 venceu a rodada por ganhar mais atributos.\n");
+        printf("\nCarta %s do Jogador %d venceu a rodada por ganhar mais atributos.\n", carta1->cidade, jogador1);
     } else if (pontos_carta2 > pontos_carta1) {
-        printf("\nCarta 2 venceu a rodada por ganhar mais atributos.\n");
+        printf("\nCarta %s do Jogador %d venceu a rodada por ganhar mais atributos.\n", carta2->cidade, jogador2);
     } else {
         if (soma_carta1 > soma_carta2) {
-            printf("\nCarta 1 venceu a rodada por maior soma dos atributos.\n");
+            printf("\nCarta %s do Jogador %d venceu a rodada por maior soma dos atributos.\n", carta1->cidade, jogador1);
         } else if (soma_carta2 > soma_carta1) {
-            printf("\nCarta 2 venceu a rodada por maior soma dos atributos.\n");
+            printf("\nCarta %s do Jogador %d venceu a rodada por maior soma dos atributos.\n", carta2->cidade, jogador2);
         } else {
             printf("\nEmpate total!\n");
         }
@@ -141,18 +147,6 @@ void limpar_buffer_ate_enter() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
-
-// Definição do tipo Carta
-typedef struct {
-    char cidade[33];    // Nome da cidade (máx 32 caracteres + '\0')
-    unsigned long int populacao;    // População em milhões
-    float area;         // Área em km²
-    float pib;         // PIB em bilhões
-    int pontos_turisticos; // Quantidade de pontos turísticos
-    float densidade_populacional; // População por km²
-    float pib_per_capita; // PIB per capita
-    float super_poder; // Soma dos atributos para o modo usuário
-} Carta;
 
 // Função para acessar atributos númericos das cartas
 float acessarAtributo(Carta* carta, int indice) {
@@ -169,10 +163,6 @@ float acessarAtributo(Carta* carta, int indice) {
     }
 }
 
-// Função para acessar o nome da cidade
-const char* acessarNomeCidade(Carta* carta) {
-    return carta->cidade;
-}
 
 // Função para exibir uma carta no formato solicitado
 void exibir_carta(Carta* carta, int numero_carta) {
@@ -194,10 +184,9 @@ int main(void) {
         typedef struct {
             char intro[1024];
             char menu_inicial[1024];
-            char seleção_de_modo_de_jogo[1024];
             char regras[1024];
             char sair[1024];
-            char créditos[1024];
+            char creditos[1024];
         } Tela;
 
         Tela telas = {
@@ -213,33 +202,21 @@ int main(void) {
             "\n"
             "1. Iniciar Jogo\n"
             "2. Ver regras\n"
-            "3. Sair\n"
+            "3. Créditos\n"
+            "4. Sair\n"
             "\n"
-            "Escolha uma opção digitando o número correspondente(1-3): \n",
-
-        .seleção_de_modo_de_jogo =
-            "\n========================================\n"
-            "        SELEÇÃO DE MODO DE JOGO\n"
-            "========================================\n"
-            "Vamos começar!\n"
-            "1 - Modo com dois atributos (escolha manual)\n"
-            "2 - Modo demonstrativo (CPU escolhe cartas e atributo)\n"
-            "3 - Voltar ao menu inicial\n"
-            "Escolha o modo de jogo com o dígito correspondente (1-3):\n",
+            "Escolha uma opção digitando o número correspondente (1-4): \n",
 
         .regras =
             "\n========================================\n"
             "                REGRAS                 \n"
+            "========================================\n"
             "1. Cada jogador escolhe uma carta de cidade dentre as disponíveis.\n"
-            "2. No modo com dois atributos:\n"
-            "   - Você escolhe dois atributos diferentes para comparar\n"
-            "   - Cada atributo é comparado separadamente\n"
-            "   - A carta que vencer em mais atributos ganha\n"
-            "   - Em caso de empate, vence a maior soma dos atributos\n"
-            "3. No modo demonstrativo:\n"
-            "   - A CPU escolhe as cartas e um atributo aleatório\n"
-            "   - Vence a carta com maior valor no atributo escolhido\n"
-            "4. Exceção: Para Densidade Populacional, vence o MENOR valor\n"
+            "2. Você escolhe dois atributos diferentes para comparar.\n"
+            "3. Cada atributo é comparado separadamente.\n"
+            "4. A carta que vencer em mais atributos ganha.\n"
+            "5. Em caso de empate, vence a maior soma dos atributos.\n"
+            "6. Exceção: Para Densidade Populacional, vence o MENOR valor.\n"
             "========================================\n"
             "Digite 1 e clique Enter para voltar ao menu inicial:\n",
 
@@ -248,16 +225,12 @@ int main(void) {
             "          SAINDO DO JOGO               \n"
             "========================================\n"
             "Obrigado por jogar! Até a próxima!\n",
-        .créditos =
+        .creditos =
             "\n========================================\n"
             "                CRÉDITOS                \n"
             "========================================\n"
             "Desenvolvido por:\n"
-            " - Aluno 1\n"
-            " - Aluno 2\n"
-            " - Aluno 3\n"
-            " - Aluno 4\n"
-            " - Aluno 5\n"
+            " - Patrick Melo\n"
             "========================================\n"
             "Aperte Enter para voltar ao menu inicial...\n"
         };
@@ -383,35 +356,17 @@ int main(void) {
                                  carta_Curitiba.pontos_turisticos + carta_Curitiba.pib_per_capita +
                                  (carta_Curitiba.densidade_populacional != 0.0f ? 1.0f / carta_Curitiba.densidade_populacional : 0.0f);
 
-    Carta carta_jogador_A;
-    strncpy(carta_jogador_A.cidade, "", sizeof(carta_jogador_A.cidade) - 1);
-    carta_jogador_A.cidade[sizeof(carta_jogador_A.cidade)-1] = '\0';
-    carta_jogador_A.populacao = 0;
-    carta_jogador_A.area = 0.0;
-    carta_jogador_A.pib = 0.0;
-    carta_jogador_A.pontos_turisticos = 0;
-    carta_jogador_A.densidade_populacional = (carta_jogador_A.area != 0.0f) ? 
-        (carta_jogador_A.populacao / carta_jogador_A.area) : 0.0f;
-    carta_jogador_A.pib_per_capita = (carta_jogador_A.populacao != 0.0f) ?
-        ((carta_jogador_A.pib * 1000000000) / (carta_jogador_A.populacao)) : 0.0f;
-    carta_jogador_A.super_poder = carta_jogador_A.populacao + carta_jogador_A.area + carta_jogador_A.pib +
-                                  carta_jogador_A.pontos_turisticos + carta_jogador_A.pib_per_capita +
-                                  (carta_jogador_A.densidade_populacional != 0.0f ? 1.0f / carta_jogador_A.densidade_populacional : 0.0f);
-
-    Carta carta_jogador_B;
-    strncpy(carta_jogador_B.cidade, "", sizeof(carta_jogador_B.cidade) - 1);
-    carta_jogador_B.cidade[sizeof(carta_jogador_B.cidade)-1] = '\0';
-    carta_jogador_B.populacao = 0;
-    carta_jogador_B.area = 0.0;
-    carta_jogador_B.pib = 0.0;
-    carta_jogador_B.pontos_turisticos = 0;
-    carta_jogador_B.densidade_populacional = (carta_jogador_B.area != 0.0f) ? 
-        (carta_jogador_B.populacao / carta_jogador_B.area) : 0.0f;
-    carta_jogador_B.pib_per_capita = (carta_jogador_B.populacao != 0.0f) ?
-        ((carta_jogador_B.pib * 1000000000) / (carta_jogador_B.populacao)) : 0.0f;
-    carta_jogador_B.super_poder = carta_jogador_B.populacao + carta_jogador_B.area + carta_jogador_B.pib +
-                                  carta_jogador_B.pontos_turisticos + carta_jogador_B.pib_per_capita +
-                                  (carta_jogador_B.densidade_populacional != 0.0f ? 1.0f / carta_jogador_B.densidade_populacional : 0.0f);
+    // Baralho para facilitar acesso por índice
+    Carta* baralho[8] = {
+        &carta_Manaus,
+        &carta_SaoPaulo,
+        &carta_RioDeJaneiro,
+        &carta_Brasilia,
+        &carta_Salvador,
+        &carta_Fortaleza,
+        &carta_BeloHorizonte,
+        &carta_Curitiba
+    };
 
     //Jogo
         int tela_atual = 0; 
@@ -422,7 +377,7 @@ int main(void) {
                 // 2 = Seleção de modo de jogo 
                 // 3 = Regras
                 // 4 = Sair
-                // 5 = Créditos
+                
                 case 0: { // Intro
                     printf("%s", telas.intro);
                     limpar_buffer_ate_enter();
@@ -435,431 +390,143 @@ int main(void) {
                     while (1) {
                         if (scanf("%d", &opcao) != 1) { // Verifica se a entrada é um número
                             limpar_buffer_ate_enter();
-                            printf("Opção inválida. Por favor, escolha 1, 2 ou 3:\n");
+                            printf("Opção inválida. Por favor, escolha 1, 2, 3 ou 4:\n");
                             continue;
                         }
+                        limpar_buffer_ate_enter(); // Limpa o \n que fica no buffer após scanf
                         switch (opcao) {
                             case 1:{
-                                tela_atual = 2; // Seleção de modo de jogo
+                                tela_atual = 2; // Iniciar jogo direto
                                 break;
                             }
                             case 2:{ // Regras
                                 tela_atual = 3;
-                                getchar();
-                                limpar_buffer_ate_enter();
                                 break;
-                        }
-                            case 3:{ // Sair
+                            }
+                            case 3:{ // Créditos
+                                tela_atual = 5;
+                                break;
+                            }
+                            case 4:{ // Sair
                                 tela_atual = 4;
                                 break;
                             }
                             default:{
-                                printf("Opção inválida. Por favor, escolha 1, 2 ou 3:\n");
+                                printf("Opção inválida. Por favor, escolha 1, 2, 3 ou 4:\n");
                                 continue;
-                        }
+                            }
                         }
                         break; // sai do while
                     }
                     break; // sai do case 1
                 }
-                case 2: { // Seleção de modo de jogo
-                    printf("%s", telas.seleção_de_modo_de_jogo);
-                    int escolha_jogo = -1;
+                case 2: { // Jogo - escolha de cartas e atributos
+                    printf("\n========================================\n");
+                    printf("          SUPER TRUNFO - JOGO          \n");
+                    printf("========================================\n\n");
+                    // Escolha das cartas primeiro
                     int carta_escolhida_jogador_1 = -1;
-                    int carta_escolhida_jogador_2 = -1;
-                    int atributo_escolhido = -1;
+                    printf("\nEscolha a carta para o Jogador 1:\n");
+                    listar_cidades(baralho, 8);
+                    
                     while (1) {
-                        if (scanf("%d", &escolha_jogo) != 1) {
+                        if (scanf("%d", &carta_escolhida_jogador_1) != 1) {
                             limpar_buffer_ate_enter();
-                            printf("Entrada inválida. Por favor, digite 1, 2 ou 3:\n");
-                        continue;
-                    }
-                        if (escolha_jogo >= 1 && escolha_jogo <= 3) {
-                            break; // Entrada válida
-                        } else {
-                            printf("Entrada inválida. Por favor, digite 1, 2 ou 3:\n");
-                        }
-                    }
-                    switch (escolha_jogo){
-                        case 1:{ // Modo com dois atributos selecionados pelo usuário
-                            printf("\nModo com dois atributos selecionado.\n");
-                            printf("\n========================================\n");
-                            printf("     MODO COM DOIS ATRIBUTOS           \n");
-                            printf("========================================\n\n");
-
-                            // Array para controlar quais atributos estão disponíveis
-                            bool atributos_disponiveis[8] = {false, true, true, true, true, true, true, true};
-                            // O primeiro elemento é falso por não haver atributo 0 na interface do usuário
-
-                            // Escolha do primeiro atributo
-                            int atributo1 = -1;
-                            while (1) {
-                                exibir_menu_atributos(atributos_disponiveis);
-                                printf("\nEscolha o primeiro atributo (1-7): ");
-                                if (scanf("%d", &atributo1) != 1) {
-                                    limpar_buffer_ate_enter();
-                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 7.\n");
-                                    continue;
-                                }
-                                if (atributo_valido(atributo1, atributos_disponiveis)) {
-                                    break;
-                                }
-                                printf("Atributo inválido. Por favor, escolha um dos atributos disponíveis.\n");
-                            }
-
-                            // Marcar o primeiro atributo como indisponível
-                            atributos_disponiveis[atributo1] = false;
-
-                            // Escolha do segundo atributo
-                            int atributo2 = -1;
-                            while (1) {
-                                printf("\nAtributo 1 selecionado. Agora escolha o segundo atributo:\n");
-                                exibir_menu_atributos(atributos_disponiveis);
-                                printf("\nEscolha o segundo atributo (1-7): ");
-                                if (scanf("%d", &atributo2) != 1) {
-                                    limpar_buffer_ate_enter();
-                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 7.\n");
-                                    continue;
-                                }
-                                if (atributo_valido(atributo2, atributos_disponiveis)) {
-                                    break;
-                                }
-                                printf("Atributo inválido ou já escolhido. Por favor, escolha outro atributo.\n");
-                            }
-
-                            // Escolha das cartas
-                            printf("\nEscolha a carta para o Jogador 1:\n");
-                            printf("1. Manaus\n2. São Paulo\n3. Rio de Janeiro\n4. Brasília\n");
-                            printf("5. Salvador\n6. Fortaleza\n7. Belo Horizonte\n8. Curitiba\n");
-                            
-                            while (1) {
-                                if (scanf("%d", &carta_escolhida_jogador_1) != 1) {
-                                    limpar_buffer_ate_enter();
-                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 8:\n");
-                                    continue;
-                                }
-                                if (carta_escolhida_jogador_1 >= 1 && carta_escolhida_jogador_1 <= 8) {
-                                    carta_escolhida_jogador_1--; // Ajusta para índice 0-7
-                                       // Mostra os detalhes da carta escolhida
-                                       switch (carta_escolhida_jogador_1) {
-                                           case 0: exibir_carta(&carta_Manaus, 1); break;
-                                           case 1: exibir_carta(&carta_SaoPaulo, 1); break;
-                                           case 2: exibir_carta(&carta_RioDeJaneiro, 1); break;
-                                           case 3: exibir_carta(&carta_Brasilia, 1); break;
-                                           case 4: exibir_carta(&carta_Salvador, 1); break;
-                                           case 5: exibir_carta(&carta_Fortaleza, 1); break;
-                                           case 6: exibir_carta(&carta_BeloHorizonte, 1); break;
-                                           case 7: exibir_carta(&carta_Curitiba, 1); break;
-                                       }
-                                       char confirmacao;
-                                       scanf(" %c", &confirmacao);
-                                       if (confirmacao == 'S' || confirmacao == 's') {
-                                    break;
-                                       }
-                                       printf("\nEscolha outra carta:\n");
-                                       printf("1. Manaus\n2. São Paulo\n3. Rio de Janeiro\n4. Brasília\n");
-                                       printf("5. Salvador\n6. Fortaleza\n7. Belo Horizonte\n8. Curitiba\n");
-                                       continue;
-                                }
-                                printf("Carta inválida. Por favor, escolha um número entre 1 e 8.\n");
-                            }
-
-                            printf("\nEscolha a carta para o Jogador 2:\n");
-                            while (1) {
-                                if (scanf("%d", &carta_escolhida_jogador_2) != 1) {
-                                    limpar_buffer_ate_enter();
-                                    printf("Entrada inválida. Por favor, escolha um número entre 1 e 8:\n");
-                                    continue;
-                                }
-                                carta_escolhida_jogador_2--; // Ajusta para índice 0-7
-                                if (carta_escolhida_jogador_2 >= 0 && carta_escolhida_jogador_2 <= 7 && 
-                                    carta_escolhida_jogador_2 != carta_escolhida_jogador_1) {
-                                       // Mostra os detalhes da carta escolhida
-                                       switch (carta_escolhida_jogador_2) {
-                                           case 0: exibir_carta(&carta_Manaus, 2); break;
-                                           case 1: exibir_carta(&carta_SaoPaulo, 2); break;
-                                           case 2: exibir_carta(&carta_RioDeJaneiro, 2); break;
-                                           case 3: exibir_carta(&carta_Brasilia, 2); break;
-                                           case 4: exibir_carta(&carta_Salvador, 2); break;
-                                           case 5: exibir_carta(&carta_Fortaleza, 2); break;
-                                           case 6: exibir_carta(&carta_BeloHorizonte, 2); break;
-                                           case 7: exibir_carta(&carta_Curitiba, 2); break;
-                                       }
-                                       char confirmacao;
-                                       scanf(" %c", &confirmacao);
-                                       if (confirmacao == 'S' || confirmacao == 's') {
-                                    break;
-                                       }
-                                       printf("\nEscolha outra carta:\n");
-                                       printf("1. Manaus\n2. São Paulo\n3. Rio de Janeiro\n4. Brasília\n");
-                                       printf("5. Salvador\n6. Fortaleza\n7. Belo Horizonte\n8. Curitiba\n");
-                                       continue;
-                                }
-                                carta_escolhida_jogador_2++; // Reverte o ajuste para mostrar mensagem
-                                printf("Carta inválida ou já escolhida. Por favor, escolha outra carta.\n");
-                            }
-
-                            // Mapear os índices para os ponteiros das cartas
-                            Carta *selA = NULL, *selB = NULL;
-                            switch (carta_escolhida_jogador_1) {
-                                case 0: selA = &carta_Manaus; break;
-                                case 1: selA = &carta_SaoPaulo; break;
-                                case 2: selA = &carta_RioDeJaneiro; break;
-                                case 3: selA = &carta_Brasilia; break;
-                                case 4: selA = &carta_Salvador; break;
-                                case 5: selA = &carta_Fortaleza; break;
-                                case 6: selA = &carta_BeloHorizonte; break;
-                                case 7: selA = &carta_Curitiba; break;
-                                default: selA = &carta_Manaus; break;
-                            }
-                            switch (carta_escolhida_jogador_2) {
-                                case 0: selB = &carta_Manaus; break;
-                                case 1: selB = &carta_SaoPaulo; break;
-                                case 2: selB = &carta_RioDeJaneiro; break;
-                                case 3: selB = &carta_Brasilia; break;
-                                case 4: selB = &carta_Salvador; break;
-                                case 5: selB = &carta_Fortaleza; break;
-                                case 6: selB = &carta_BeloHorizonte; break;
-                                case 7: selB = &carta_Curitiba; break;
-                                default: selB = &carta_SaoPaulo; break;
-                            }
-
-                            printf("\nComparando as cartas com os atributos escolhidos:\n");
-                            comparar_cartas_dois_atributos(selA, selB, atributo1, atributo2);
-
-                            printf("\nPressione Enter para continuar...");
-                            limpar_buffer_ate_enter();
-                            getchar();
-                            tela_atual = 1; // Volta para o menu inicial
-                            break;
-                        }
-                        case 2:{ // CPU modo demonstrativo (escolhe duas cartas prontas de 08 cartas)
-                            printf("\nModo demonstrativo selecionado.\n");
-                            printf("\n========================================\n");
-                            printf("          MODO DEMONSTRATIVO           \n");
-                            printf("========================================\n\n");
-                            srand((unsigned int)time(NULL));
-                            // escolher índices entre 0 e 7 (o baralho tem 8 cartas)
-                            carta_escolhida_jogador_1 = rand() % 8;
-                            carta_escolhida_jogador_2 = rand() % 8;
-                            /* Garante que as duas cartas escolhidas pela CPU sejam distintas. */
-                            while (carta_escolhida_jogador_2 == carta_escolhida_jogador_1) {
-                                carta_escolhida_jogador_2 = rand() % 8;
-                                printf("CPU sorteou novamente para garantir cartas diferentes.\n");
-                            }
-                            atributo_escolhido = (rand() % 7) + 1; // soma com  1 para excluir o 0 dos intervalos possíveis
-                            
-                            // Mapear os índices para os ponteiros das cartas
-                            Carta *selA = NULL, *selB = NULL;
-                            switch (carta_escolhida_jogador_1) {
-                                case 0: selA = &carta_Manaus; break;
-                                case 1: selA = &carta_SaoPaulo; break;
-                                case 2: selA = &carta_RioDeJaneiro; break;
-                                case 3: selA = &carta_Brasilia; break;
-                                case 4: selA = &carta_Salvador; break;
-                                case 5: selA = &carta_Fortaleza; break;
-                                case 6: selA = &carta_BeloHorizonte; break;
-                                case 7: selA = &carta_Curitiba; break;
-                                default: selA = &carta_Manaus; break;
-                            }
-                            switch (carta_escolhida_jogador_2) {
-                                case 0: selB = &carta_Manaus; break;
-                                case 1: selB = &carta_SaoPaulo; break;
-                                case 2: selB = &carta_RioDeJaneiro; break;
-                                case 3: selB = &carta_Brasilia; break;
-                                case 4: selB = &carta_Salvador; break;
-                                case 5: selB = &carta_Fortaleza; break;
-                                case 6: selB = &carta_BeloHorizonte; break;
-                                case 7: selB = &carta_Curitiba; break;
-                                default: selB = &carta_SaoPaulo; break;
-                            }
-
-                            // Mostrar nomes das cartas escolhidas (em vez do número)
-                            printf("A CPU escolheu a carta '%s' para o jogador 1!\n", acessarNomeCidade(selA));
-                            printf("A CPU escolheu a carta '%s' para o jogador 2!\n", acessarNomeCidade(selB));
-
-                            // Pré-calcular variáveis usadas nas mensagens de saída
-                            int int_populacao_jogador_A = (int)selA->populacao;
-                            int int_populacao_jogador_B = (int)selB->populacao;
-                            float float_area_jogador_A = selA->area;
-                            float float_area_jogador_B = selB->area;
-                            float densidade_A = selA->densidade_populacional;
-                            float densidade_B = selB->densidade_populacional;
-                            float float_pib_jogador_A = selA->pib;
-                            float float_pib_jogador_B = selB->pib;
-                            float per_capita_A = selA->pib_per_capita;
-                            float per_capita_B = selB->pib_per_capita;
-                            int qtde_pontos_turisticos_jogador_A = selA->pontos_turisticos;
-                            int qtde_pontos_turisticos_jogador_B = selB->pontos_turisticos;
-                            float super_poder_A = selA->super_poder;
-                            float super_poder_B = selB->super_poder;
-                            printf("\nA CPU escolheu o atributo número %d para comparar!\n", atributo_escolhido);
-                            printf("Os atributos são:\n");
-                            printf("1. População\n");
-                            printf("2. Área\n");
-                            printf("3. Densidade populacional\n");
-                            printf("4. PIB\n");
-                            printf("5. PIB per capita\n");
-                            printf("6. Pontos turísticos\n");
-                            printf("7. Super Poder\n\n");
-
-                            switch (atributo_escolhido) {
-                                case 1:{ // População
-                                    printf("Atributo escolhido: População\n");
-                                    printf("Jogador A: %d milhões\n", int_populacao_jogador_A);
-                                    printf("Jogador B: %d milhões\n", int_populacao_jogador_B);
-                                    if (int_populacao_jogador_A > int_populacao_jogador_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo População\n");
-                                    else if (int_populacao_jogador_A < int_populacao_jogador_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo População\n");
-                                    else
-                                        printf("Empate no atributo População\n");
-                                    break;
-                                }
-                                case 2:{ // Área
-                                    printf("Atributo escolhido: Área\n");
-                                    printf("Jogador A: %.2f km²\n", float_area_jogador_A);
-                                    printf("Jogador B: %.2f km²\n", float_area_jogador_B);
-                                    if (float_area_jogador_A > float_area_jogador_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo Área\n");
-                                    else if (float_area_jogador_A < float_area_jogador_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo Área\n");
-                                    else
-                                        printf("Empate no atributo Área\n");
-                                    break;
-                                }
-                                case 3: {
-                                    printf("Atributo escolhido: Densidade populacional\n");
-                                    printf("Jogador A: %.2f hab/km²\n", densidade_A);
-                                    printf("Jogador B: %.2f hab/km²\n", densidade_B);
-                                    if (densidade_A < densidade_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo Densidade Populacional\n");
-                                    else if (densidade_A > densidade_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo Densidade Populacional\n");
-                                    else
-                                        printf("Empate no atributo Densidade Populacional\n");
-                                    break;
-                                }
-                                case 4:{
-                                    printf("Atributo escolhido: PIB\n");
-                                    printf("Jogador A: %.2f bilhões\n", float_pib_jogador_A);
-                                    printf("Jogador B: %.2f bilhões\n", float_pib_jogador_B);
-                                    if (float_pib_jogador_A > float_pib_jogador_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo PIB\n");
-                                    else if (float_pib_jogador_A < float_pib_jogador_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo PIB\n");
-                                    else
-                                        printf("Empate no atributo PIB\n");
-                                    break;
-                                }
-                                case 5: {
-                                    printf("Atributo escolhido: PIB per capita\n");
-                                    printf("Jogador A: R$ %.2f\n", per_capita_A);
-                                    printf("Jogador B: R$ %.2f\n", per_capita_B);
-                                    if (per_capita_A > per_capita_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo PIB per Capita\n");
-                                    else if (per_capita_A < per_capita_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo PIB per Capita\n");
-                                    else
-                                        printf("Empate no atributo PIB per Capita\n");
-                                    break;
-                                }
-                                case 6:{
-                                    printf("Atributo escolhido: Pontos turísticos\n");
-                                    printf("Jogador A: %d pontos\n", qtde_pontos_turisticos_jogador_A);
-                                    printf("Jogador B: %d pontos\n", qtde_pontos_turisticos_jogador_B);
-                                    if (qtde_pontos_turisticos_jogador_A > qtde_pontos_turisticos_jogador_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo Pontos Turísticos\n");
-                                    else if (qtde_pontos_turisticos_jogador_A < qtde_pontos_turisticos_jogador_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo Pontos Turísticos\n");
-                                    else
-                                        printf("Empate no atributo Pontos Turísticos\n");
-                                    break;
-                                }
-                                case 7: {
-                                    printf("Atributo escolhido: Super Poder\n");
-                                    printf("Jogador A: %.2f pontos\n", super_poder_A);
-                                    printf("Jogador B: %.2f pontos\n", super_poder_B);
-                                    if (super_poder_A > super_poder_B)
-                                        printf("Carta 1 venceu Carta 2 no atributo Super Poder\n");
-                                    else if (super_poder_A < super_poder_B)
-                                        printf("Carta 2 venceu Carta 1 no atributo Super Poder\n");
-                                    else
-                                        printf("Empate no atributo Super Poder\n");
-                                    break;
-                                }
-                                default:{
-                                    printf("Atributo inválido!\n");    
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                        case 2:{ // Modo usuário (escolha duas cartas prontas ou crie duas novas)
-                            printf("\n========================================\n");
-                            printf("   MODO USUÁRIO  \n");
-                            printf("========================================\n\n");
-                            
-                            printf("Jogador 1, escolha sua carta (0-8):\n");
-                            printf("0 - Manaus\n");
-                            printf("1 - Sao Paulo\n");
-                            printf("2 - Rio de Janeiro\n");
-                            printf("3 - Brasilia\n");
-                            printf("4 - Salvador\n");
-                            printf("5 - Fortaleza\n");
-                            printf("6 - Belo Horizonte\n");
-                            printf("7 - Curitiba\n");
-                            printf("8 - Criar nova carta\n");
-
-                                while (carta_escolhida_jogador_1 < 0 || carta_escolhida_jogador_1 > 8) {
-                                    if (scanf("%d", &carta_escolhida_jogador_1) != 1) {
-                                        limpar_buffer_ate_enter();
-                                        printf("Opção inválida. Por favor, escolha um carta de 0 a 7:\n");
-                                        continue;
-                                    }
-                                }
-
-                            printf("\nCarta escolhida pelo Jogador 1: %d\n", carta_escolhida_jogador_1);
-                            printf("\nJogador 2, escolha sua carta (0-8) (não pode escolher a mesma carta do Jogador 1):\n");
-                            printf("0 - Manaus\n");
-                            printf("1 - Sao Paulo\n");
-                            printf("2 - Rio de Janeiro\n");
-                            printf("3 - Brasilia\n");
-                            printf("4 - Salvador\n");
-                            printf("5 - Fortaleza\n");
-                            printf("6 - Belo Horizonte\n");
-                            printf("7 - Curitiba\n");
-                            printf("8 - Criar nova carta\n");
-
-                            while (1) {
-                                if (scanf("%d", &carta_escolhida_jogador_2) != 1) {
-                                    limpar_buffer_ate_enter();
-                                    printf("Opção inválida. Por favor, escolha uma carta válida de 0 a 8:\n");
-                                    continue;
-                                }
-                                /* validações: intervalo e não repetição da carta escolhida pelo jogador 1 */
-                                if (carta_escolhida_jogador_2 < 0 || carta_escolhida_jogador_2 > 8) {
-                                    printf("Opção fora do intervalo. Escolha uma carta de 0 a 8:\n");
-                                    continue;
-                                }
-                                if (carta_escolhida_jogador_2 == carta_escolhida_jogador_1) {
-                                    printf("Essa carta já foi escolhida pelo Jogador 1. Escolha outra carta:\n");
-                                    continue;
-                                }
-                                break; /* escolha válida */
-                            }
-                            break;
-                        }
-                        case 3:{ // Voltar ao menu inicial
-                            tela_atual = 1;
-                            break;
-                        } 
-                        default:{ printf("Opção inválida. Por favor, escolha 0, 1, 2 ou 3:\n");
+                            printf("Entrada inválida. Por favor, escolha um número entre 1 e 8:\n");
                             continue;
-                        break;
                         }
+                        if (carta_escolhida_jogador_1 >= 1 && carta_escolhida_jogador_1 <= 8) {
+                            carta_escolhida_jogador_1--; // Ajusta para índice 0-7
+                            // Mostra os detalhes da carta escolhida
+                            exibir_carta(baralho[carta_escolhida_jogador_1], 1);
+                            char confirmacao;
+                            scanf(" %c", &confirmacao);
+                            if (confirmacao == 'S' || confirmacao == 's') {
+                                break;
+                            }
+                            printf("\nEscolha outra carta:\n");
+                            listar_cidades(baralho, 8);
+                            continue;
+                        }
+                        printf("Carta inválida. Por favor, escolha um número entre 1 e 8.\n");
                     }
-                    break; /* evita fallthrough para case 3 */
+
+                    int carta_escolhida_jogador_2 = -1;
+                    printf("\nEscolha a carta para o Jogador 2:\n");
+                    listar_cidades_disponiveis(baralho, 8, carta_escolhida_jogador_1);
+                    while (1) {
+                        if (scanf("%d", &carta_escolhida_jogador_2) != 1) {
+                            limpar_buffer_ate_enter();
+                            printf("Entrada inválida. Por favor, escolha um número entre 1 e 8:\n");
+                            continue;
+                        }
+                        if (carta_escolhida_jogador_2 >= 1 && carta_escolhida_jogador_2 <= 8) {
+                            carta_escolhida_jogador_2--; // Ajusta para 0-7
+                            if (carta_escolhida_jogador_2 == carta_escolhida_jogador_1) {
+                                printf("Essa carta já foi escolhida pelo Jogador 1. Escolha outra carta:\n");
+                                continue;
+                            }
+                            // Mostra os detalhes da carta escolhida
+                            exibir_carta(baralho[carta_escolhida_jogador_2], 2);
+                            char confirmacao;
+                            scanf(" %c", &confirmacao);
+                            if (confirmacao == 'S' || confirmacao == 's') {
+                                break;
+                            }
+                            printf("\nEscolha outra carta:\n");
+                            listar_cidades_disponiveis(baralho, 8, carta_escolhida_jogador_1);
+                            continue;
+                        }
+                        printf("Carta inválida ou já escolhida. Por favor, escolha outra carta.\n");
+                    }
+
+                    // Mapear os índices para os ponteiros das cartas via baralho
+                    Carta *selA = baralho[carta_escolhida_jogador_1];
+                    Carta *selB = baralho[carta_escolhida_jogador_2];
+
+                    // Agora escolher os atributos
+                    bool atributos_disponiveis[8] = {false, true, true, true, true, true, true, true};
+                    int atributo1 = -1;
+                    while (1) {
+                        printf("\nEscolha o primeiro atributo para comparação:\n");
+                        exibir_menu_atributos(atributos_disponiveis);
+                        printf("\nDigite o número do atributo (1-7): ");
+                        if (scanf("%d", &atributo1) != 1) {
+                            limpar_buffer_ate_enter();
+                            printf("Entrada inválida. Por favor, escolha um número entre 1 e 7.\n");
+                            continue;
+                        }
+                        if (atributo_valido(atributo1, atributos_disponiveis)) {
+                            break;
+                        }
+                        printf("Atributo inválido. Por favor, escolha um dos atributos disponíveis.\n");
+                    }
+                    atributos_disponiveis[atributo1] = false;
+
+                    int atributo2 = -1;
+                    while (1) {
+                        printf("\nEscolha o segundo atributo para comparação:\n");
+                        exibir_menu_atributos(atributos_disponiveis);
+                        printf("\nDigite o número do atributo (1-7): ");
+                        if (scanf("%d", &atributo2) != 1) {
+                            limpar_buffer_ate_enter();
+                            printf("Entrada inválida. Por favor, escolha um número entre 1 e 7.\n");
+                            continue;
+                        }
+                        if (atributo_valido(atributo2, atributos_disponiveis)) {
+                            break;
+                        }
+                        printf("Atributo inválido ou já escolhido. Por favor, escolha outro atributo.\n");
+                    }
+
+                    printf("\nComparando as cartas com os atributos escolhidos:\n");
+                    comparar_cartas_dois_atributos(selA, selB, atributo1, atributo2, 1, 2);
+
+                    printf("\nPressione Enter para continuar...");
+                    limpar_buffer_ate_enter();
+                    getchar();
+                    tela_atual = 5; // Vai para os créditos
+                    break;
                 }
                 case 3: { // Regras
                     printf("%s", telas.regras);
@@ -872,9 +539,9 @@ int main(void) {
                         }
                         limpar_buffer_ate_enter();
                         if (opcao == 1) break;
-                        printf("\nPor favor digite 1 para voltar ao menu inicial: ");
+                        printf("\nPor favor digite 1 para voltar ao menu inicial:\n");
                     }
-                    tela_atual = 0;
+                    tela_atual = 1;
                     break;
                  }
                 case 4: { // Sair
@@ -883,15 +550,14 @@ int main(void) {
                     return 0;
                 }
                 case 5: { // Créditos
-                    printf("%s", telas.créditos);
-                    tela_atual = 0;
-                    getchar();
+                    printf("%s", telas.creditos);
                     limpar_buffer_ate_enter();
+                    tela_atual = 1;
                     break;
                 }
                 default: { // Erro: tela desconhecida
                     printf("Erro: Tela desconhecida. Voltando ao menu inicial.\n");
-                    tela_atual = 0;
+                    tela_atual = 1;
                     break;
                 } 
             }
